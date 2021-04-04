@@ -1,0 +1,8 @@
+name: Skyblock
+version: ${project.version}
+main: io.github.trianmc.skyblock.Skyblock
+api-version: 1.16
+prefix: Trian Skyblock
+depend: [ FastAsyncWorldEdit ]
+authors: [ bluelhf ]
+description: Skyblock plugin for Trian

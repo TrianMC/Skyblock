@@ -1,0 +1,4 @@
+levels:
+  air: 0
+  lava: 20
+  default: 0
