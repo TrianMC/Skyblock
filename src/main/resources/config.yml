@@ -1,3 +1,4 @@
+language: none
 levels:
   air: 0
   lava: 20

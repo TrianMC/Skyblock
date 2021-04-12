@@ -3,8 +3,8 @@ package io.github.trianmc.skyblock.listener;
 import io.github.trianmc.skyblock.Skyblock;
 import io.github.trianmc.skyblock.islands.Island;
 import io.github.trianmc.skyblock.members.Rights;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import io.github.trianmc.skyblock.config.Lang;
+import io.github.trianmc.skyblock.util.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -22,16 +22,18 @@ import java.util.function.Consumer;
 
 public class ProtectionListener implements Listener {
     private final Skyblock host;
-    private HashMap<UUID, Long> cooldownMap = new HashMap<>();
+    private final HashMap<UUID, Long> cooldownMap = new HashMap<>();
 
     public ProtectionListener(Skyblock host) {
         this.host = host;
     }
     private void protect(Location location, Player player, Runnable r) {
         withIsland(location, (island) -> {
+            Lang lang = host.getLang();
             if (!isPeer(player, island)) {
                 if (System.currentTimeMillis() > cooldownMap.getOrDefault(player.getUniqueId(), 0L)) {
-                    player.sendMessage(Component.text("You cannot do that as a visitor!").color(NamedTextColor.RED));
+                    Rights rights = island.getMembers().getRights(player.getUniqueId());
+                    PlayerUtils.send(player, host.getLang(), "island.disallowed", rights.forLang(lang));
                     cooldownMap.put(player.getUniqueId(), System.currentTimeMillis() + 10000L);
                 }
                 r.run();

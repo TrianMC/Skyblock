@@ -14,8 +14,16 @@ public class IOUtils {
         return new BufferedOutputStream(new FileOutputStream(path.toFile()));
     }
 
+    public static OutputStreamWriter writer(Path path) throws FileNotFoundException {
+        return new OutputStreamWriter(write(path));
+    }
+
     public static InputStream read(Path path) throws FileNotFoundException {
         return new BufferedInputStream(new FileInputStream(path.toFile()));
+    }
+
+    public static InputStreamReader reader(Path path) throws FileNotFoundException {
+        return new InputStreamReader(read(path));
     }
 
     public static int writeUUID(OutputStream stream, UUID uuid) throws IOException {

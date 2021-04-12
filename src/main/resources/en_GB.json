@@ -1,0 +1,150 @@
+{
+  "lang.version": "0",
+  "language.name": "English",
+  "language.region": "United Kingdom",
+  "language.code": "en_GB",
+  "generic.prefix": [
+    {
+      "text": "k",
+      "color": "black",
+      "bold": "true",
+      "obfuscated": "true"
+    },
+    {
+      "text": "Trian",
+      "color": "blue",
+      "bold": "true"
+    },
+    {
+      "text": "k",
+      "color": "black",
+      "bold": "true",
+      "obfuscated": "true"
+    },
+    {
+      "text": " \u00BB",
+      "color": "dark_gray"
+    }
+  ],
+  "generic.none": {
+    "text": "?"
+  },
+  "generic.you": {
+    "text": "You"
+  },
+  "generic.teleported": {
+    "text": "You have been teleported!",
+    "color": "green"
+  },
+  "generic.no_such_player": {
+    "text": "A player by that name isn't online!",
+    "color": "red"
+  },
+  "invites.cannot_invite_self": {
+    "text": "You cannot invite yourself as a peer!",
+    "color": "red"
+  },
+  "rights.visitor": {
+    "text": "Visitor"
+  },
+  "rights.peer": {
+    "text": "Peer"
+  },
+  "rights.owner": {
+    "text": "Owner"
+  },
+  "gui.back": {
+    "text": "Back"
+  },
+  "gui.next": {
+    "text": "Next"
+  },
+  "gui.create": {
+    "text": "Create",
+    "color": "yellow"
+  },
+  "island.disallowed": {
+    "text": "You cannot do that as a %s!",
+    "color": "red"
+  },
+  "player.not_on_island": {
+    "text": "You're not on an island!",
+    "color": "red"
+  },
+  "gui.island_icon.text": {
+    "text": "Island %s"
+  },
+  "gui.island_icon.lore": [
+    {
+      "text": "Island Size: %1$s",
+      "italic": "false",
+      "color": "gray"
+    },
+    {
+      "text": "Island Level: ",
+      "italic": "false",
+      "color": "gray",
+      "extra": [
+        {"raw": "%2$s"}
+      ]
+    },
+    {
+      "text": "Role: ",
+      "italic": "false",
+      "color": "gray",
+      "extra": [
+        {"raw": "%3$s"}
+      ]
+    },
+    {
+      "text": "%4$s",
+      "italic": "false",
+      "color": "gray"
+    },
+    {
+      "text": "",
+      "bold": "true",
+      "italic": "false",
+      "color": "red",
+      "extra": [
+        {"text": "Press "},
+        {"keybind": "key.drop"},
+        {"text": " to delete the island."}
+      ]
+    }
+  ],
+  "island.created": {
+    "text": "Island created!",
+    "color": "green"
+  },
+  "island.level.already_calculating": {
+    "text": "You're already calculating an island level!",
+    "color": "red"
+  },
+  "island.level.calculating": {
+    "text": "Calculating island level...",
+    "color": "yellow"
+  },
+  "island.level.long_calculation": {
+    "text": "The calculation is taking a while! We'll now start tracking progress.",
+    "color": "gold"
+  },
+  "island.level.calculation_progress": {
+    "text": "Island level calculation progress: %d / %d (%s)",
+    "color": "red"
+  },
+  "island.level.calculated": [
+    {
+      "text": "Your island level is ",
+      "color": "white"
+    },
+    {
+      "text": "%1$s",
+      "color": "yellow"
+    },
+    {
+      "text": " (%2$sms)",
+      "color": "gray"
+    }
+  ]
+}

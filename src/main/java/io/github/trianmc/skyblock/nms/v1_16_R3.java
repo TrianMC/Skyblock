@@ -1,13 +1,16 @@
 package io.github.trianmc.skyblock.nms;
 
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_16_R3.WorldBorder;
+import com.google.common.collect.ImmutableMap;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Location;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 public class v1_16_R3 implements INms {
 
@@ -42,5 +45,23 @@ public class v1_16_R3 implements INms {
                 wb.getWarningDistance(),
                 wb.getWarningTime()
         );
+    }
+
+    @Override
+    public boolean implicitMatch(BlockData one, BlockData other) {
+        if (one.getMaterial() != other.getMaterial()) return false;
+        CraftBlockData craftOne = (CraftBlockData) one;
+        CraftBlockData craftOther = (CraftBlockData) other;
+        IBlockData stateOne = craftOne.getState();
+        IBlockData stateOther = craftOther.getState();
+        ImmutableMap<IBlockState<?>, Comparable<?>> oneMap = stateOne.getStateMap();
+        ImmutableMap<IBlockState<?>, Comparable<?>> otherMap = stateOther.getStateMap();
+        for (Map.Entry<IBlockState<?>, Comparable<?>> entry : oneMap.entrySet()) {
+            IBlockState<?> key = entry.getKey();
+            Comparable<?> otherValue = otherMap.get(key);
+            if (otherValue != null && !entry.getValue().equals(otherValue))
+                return false;
+        }
+        return true;
     }
 }

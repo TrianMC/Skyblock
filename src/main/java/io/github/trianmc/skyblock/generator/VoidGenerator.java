@@ -1,4 +1,4 @@
-package io.github.trianmc.skyblock;
+package io.github.trianmc.skyblock.generator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

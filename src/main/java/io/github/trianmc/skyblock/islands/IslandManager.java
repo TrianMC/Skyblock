@@ -9,9 +9,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import io.github.trianmc.skyblock.Skyblock;
 import io.github.trianmc.skyblock.members.Members;
 import io.github.trianmc.skyblock.members.Rights;
-import io.github.trianmc.skyblock.members.SkyPlayer;
 import io.github.trianmc.skyblock.util.IOUtils;
-import io.github.trianmc.skyblock.util.MathUtils;
+import io.github.trianmc.skyblock.util.math.MathUtils;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,10 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class IslandManager implements AutoCloseable {
@@ -35,7 +32,9 @@ public class IslandManager implements AutoCloseable {
     private final Skyblock host;
     private final Path dataFile;
     private final Path schematicFolder;
-    private final int borderTaskID;
+
+    private final int islandTickTask;
+    private long islandTick = 0;
 
     /**
      * Constructs a new IslandManager
@@ -52,9 +51,13 @@ public class IslandManager implements AutoCloseable {
         Files.createDirectories(schematicFolder);
         read();
 
-        borderTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(host, () -> {
+        final int period = 10;
+        islandTickTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(host, () -> {
+            islandTick++;
+            boolean levels = islandTick % (200 / period) == 0;
             HashMap<Island, ArrayList<Player>> playerMap = new HashMap<>();
             for (Island is : islands) {
+                if (levels) is.calculateLevel();
                 playerMap.putIfAbsent(is, new ArrayList<>());
             }
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -66,7 +69,7 @@ public class IslandManager implements AutoCloseable {
             for (Island island : playerMap.keySet()) {
                 island.update(playerMap.get(island));
             }
-        }, 20, 10);
+        }, 20, period);
     }
 
     @Nullable
@@ -78,7 +81,7 @@ public class IslandManager implements AutoCloseable {
         return null;
     }
 
-    public void createIsland(SkyPlayer owner) {
+    public void createIsland(Player owner) {
         int[] pos = MathUtils.spiralAt(islands.size());
         int x = pos[0] * 1024;
         int z = pos[1] * 1024;
@@ -87,16 +90,14 @@ public class IslandManager implements AutoCloseable {
         Location loc = new Location(world,
                 x, 128, z);
 
-        owner.with((player) -> player
-                        .teleportAsync(loc)
-                        .thenRun(() -> pasteIsland(loc)),
-                (uuid) -> pasteIsland(loc));
+        pasteIsland(loc);
+        owner.teleportAsync(loc).thenRun(() -> pasteIsland(loc));
 
         Island island = new Island.IslandBuilder()
                 .host(this)
                 .location(loc)
-                .members(new Members(owner.getUUID()))
-                .size(32)
+                .members(new Members(owner.getUniqueId()))
+                .size(256)
                 .build();
 
 
@@ -115,6 +116,19 @@ public class IslandManager implements AutoCloseable {
                 .build();
         Operations.complete(operation);
         return operation;
+    }
+
+    public void removeIsland(Island island) {
+        ArrayList<CompletableFuture<Void>> tpFutures = new ArrayList<>();
+        for (Player player : island.getVisitorCache()) {
+            tpFutures.add(player.teleportAsync(player.getWorld().getSpawnLocation()).thenAccept(result -> {}));
+        }
+
+        CompletableFuture.allOf(tpFutures.toArray(CompletableFuture[]::new)).thenRun(() -> {
+            island.update(new ArrayList<>());
+            island.clear();
+            islands.remove(island);
+        });
     }
 
 
@@ -142,7 +156,7 @@ public class IslandManager implements AutoCloseable {
         return size;
     }
 
-    public Collection<Island> getIslands(UUID uuid) {
+    public List<Island> getIslands(UUID uuid) {
         return islands.stream()
                 .filter(island -> island.getMembers().hasRights(uuid, Rights.OWNER))
                 .collect(Collectors.toUnmodifiableList());
@@ -158,7 +172,7 @@ public class IslandManager implements AutoCloseable {
 
     @Override
     public void close() {
-        Bukkit.getScheduler().cancelTask(borderTaskID);
+        Bukkit.getScheduler().cancelTask(islandTickTask);
         write();
     }
 }

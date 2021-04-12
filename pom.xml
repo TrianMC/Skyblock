@@ -113,6 +113,10 @@
             <id>tasks-repo</id>
             <url>https://raw.githubusercontent.com/bluelhf/Tasks/mvn-repo/</url>
         </repository>
+        <repository>
+            <id>anemone-repo</id>
+            <url>https://raw.githubusercontent.com/bluelhf/Anemone/mvn-repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -122,6 +126,7 @@
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Clone https://github.com/PaperMC/Paper and run ./paper install -->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper</artifactId>
@@ -150,6 +155,11 @@
             <groupId>io.github.bluelhf</groupId>
             <artifactId>Tasks</artifactId>
             <version>0001</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bluelhf</groupId>
+            <artifactId>Anemone</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

@@ -49,6 +49,12 @@ public class Members {
         return this;
     }
 
+    public Rights getRights(UUID uuid) {
+        if (owner.equals(uuid)) return Rights.OWNER;
+        if (peers.contains(uuid)) return Rights.PEER;
+        return Rights.VISITOR;
+    }
+
     public boolean hasRights(UUID uuid, Rights rights) {
         Rights trueRights = Rights.VISITOR;
         if (peers.contains(uuid)) trueRights = Rights.PEER;
@@ -58,12 +64,13 @@ public class Members {
 
     @SneakyThrows(IOException.class)
     public int write(OutputStream stream) {
-        IOUtils.writeUUID(stream, owner);
-        IOUtils.writeInt(stream, peers.size());
+        int size = 0;
+        size += IOUtils.writeUUID(stream, owner);
+        size += IOUtils.writeInt(stream, peers.size());
         for (UUID peer : peers) {
-            IOUtils.writeUUID(stream, peer);
+            size += IOUtils.writeUUID(stream, peer);
         }
 
-        return Long.BYTES * 2 + Integer.BYTES * 3;
+        return size;
     }
 }

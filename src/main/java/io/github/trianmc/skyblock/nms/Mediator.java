@@ -7,6 +7,7 @@ public class Mediator {
 
     private static INms nms;
     static {
+        //noinspection SwitchStatementWithTooFewBranches we'll add branches later
         switch (getNMSVersion()) {
             case "v1_16_R3":
                 nms = new v1_16_R3();
