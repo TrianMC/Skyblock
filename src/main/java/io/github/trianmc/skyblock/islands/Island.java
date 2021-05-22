@@ -1,13 +1,18 @@
 package io.github.trianmc.skyblock.islands;
 
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import io.github.bluelhf.anemone.gui.ViewContext;
 import io.github.bluelhf.anemone.util.Items;
 import io.github.bluelhf.tasks.Task;
@@ -36,10 +41,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.sk89q.worldedit.bukkit.BukkitAdapter.adapt;
 import static io.github.trianmc.skyblock.util.sfx.Components.unstyle;
 import static java.lang.StrictMath.floorDiv;
 import static java.lang.StrictMath.floorMod;
@@ -115,7 +123,7 @@ public class Island {
         int maxY = world.getMaxHeight();
         int minZ = location.getBlockZ() - size;
         int maxZ = location.getBlockZ() + size;
-        return (maxX - minX) * (maxY - minY) * (maxZ - minZ);
+        return (long) (maxX - minX) * (maxY - minY) * (maxZ - minZ);
     }
 
     public Location getCorner(int c) {
@@ -172,7 +180,7 @@ public class Island {
                                     for (int y = minY; y < maxY; y++) {
                                         QuickBlockData data = new QuickBlockData(snapshot.getBlockData(x, y, z));
                                         if (data.bd.getMaterial() == Material.AIR) continue;
-                                        total.addAndGet(valueMap.getDouble(data));
+                                        total.addAndGet(valueMap.getOrDefault(data, valueMap.defaultReturnValue()));
                                     }
                                 }
                             }
@@ -196,23 +204,29 @@ public class Island {
         return task;
     }
 
-    public CompletableFuture<Void> clear() {
+    public void clear() {
         Region region = new CuboidRegion(
-                BukkitAdapter.adapt(getCorner(-1)).toBlockPoint(),
-                BukkitAdapter.adapt(getCorner(1)).toBlockPoint()
+                adapt(getCorner(-1)).toVector().toBlockPoint(),
+                adapt(getCorner(1)).toVector().toBlockPoint()
         );
-        return CompletableFuture.runAsync(() -> {
-            try (EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(location.getWorld()))
-                    .fastmode(true)
-                    .build()) {
-                session.disableHistory();
 
-                BlockData bd = Bukkit.createBlockData(Material.AIR);
-                BlockState type = BukkitAdapter.adapt(bd);
-                session.replaceBlocks(region, Masks.negate(type.toMask()), type);
-                session.flushQueue();
-            }
-        });
+        com.sk89q.worldedit.world.World world = adapt(location.getWorld());
+        try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(world)
+                .build()) {
+
+            Map<SideEffect, SideEffect.State> stateMap = new HashMap<>();
+            for (SideEffect effect : SideEffect.values()) stateMap.put(effect, SideEffect.State.DELAYED);
+            session.setSideEffectApplier(new SideEffectSet(stateMap));
+
+            BlockData bd = Bukkit.createBlockData(Material.AIR);
+            BlockState state = adapt(bd);
+            BlockType type = state.getBlockType();
+            session.replaceBlocks(region, Masks.negate(new BlockTypeMask(world, type)), state);
+            Operations.complete(session.commit());
+        } catch (WorldEditException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getSize() {

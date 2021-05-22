@@ -48,6 +48,15 @@ public class IOUtils {
         return ByteBuffer.wrap(stream.readNBytes(Integer.BYTES)).getInt();
     }
 
+    public static int writeDouble(OutputStream stream, double num) throws IOException {
+        stream.write(ByteBuffer.allocate(Double.BYTES).putDouble(num).array());
+        return Double.BYTES;
+    }
+
+    public static double readDouble(InputStream stream) throws IOException {
+        return ByteBuffer.wrap(stream.readNBytes(Double.BYTES)).getDouble();
+    }
+
     public static int writeXYZ(OutputStream stream, Location location) throws IOException {
         int size = 0;
         size += writeInt(stream, location.getBlockX());

@@ -1,5 +1,6 @@
 package io.github.trianmc.skyblock.modifications;
 
+import io.github.trianmc.skyblock.Skyblock;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,8 +34,15 @@ public class Generators implements Listener {
         for (double f : GENERABLES.values()) sum += f;
     }
 
+    private final Skyblock host;
+
+    public Generators(Skyblock host) {
+        this.host = host;
+    }
+
     @EventHandler
     public void onGenerate(BlockFormEvent event) {
+        if (host.getIslandManager().getIslandAt(event.getBlock().getLocation()) == null) return;
         if (event.getNewState().getType() == Material.COBBLESTONE)
             event.getNewState().setType(getRandom());
     }

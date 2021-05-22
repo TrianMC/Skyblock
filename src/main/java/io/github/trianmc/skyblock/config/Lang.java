@@ -103,8 +103,8 @@ public class Lang {
         return Collections.singletonList(Component.text("invalid.lang.entry"));
     }
 
-    public String getString(String path) {
-        return lang.get(path) != null ? lang.get(path).getAsString() : null;
+    public String getString(String path, Object... format) {
+        return lang.get(path) != null ? String.format(lang.get(path).getAsString(), format) : null;
     }
 
     public String getLanguageName() {

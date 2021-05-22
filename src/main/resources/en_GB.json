@@ -3,6 +3,26 @@
   "language.name": "English",
   "language.region": "United Kingdom",
   "language.code": "en_GB",
+
+  "currency.singular": {
+    "text": "token",
+    "color": "blue"
+  },
+  "currency.simple_plural": {
+    "text": "tokens",
+    "color": "blue"
+  },
+
+  "currency.plural": {
+    "text": "%s tokens",
+    "color": "blue"
+  },
+
+  "generic.reloaded": [
+    {"text": "Reloaded in "},
+    {"text": "%sms", "color": "blue"}
+  ],
+
   "generic.prefix": [
     {
       "text": "k",
@@ -72,7 +92,7 @@
     "color": "red"
   },
   "gui.island_icon.text": {
-    "text": "Island %s"
+    "text": "Island %1$s"
   },
   "gui.island_icon.lore": [
     {
@@ -85,7 +105,9 @@
       "italic": "false",
       "color": "gray",
       "extra": [
-        {"raw": "%2$s"}
+        {
+          "raw": "%2$s"
+        }
       ]
     },
     {
@@ -93,7 +115,9 @@
       "italic": "false",
       "color": "gray",
       "extra": [
-        {"raw": "%3$s"}
+        {
+          "raw": "%3$s"
+        }
       ]
     },
     {
@@ -107,9 +131,15 @@
       "italic": "false",
       "color": "red",
       "extra": [
-        {"text": "Press "},
-        {"keybind": "key.drop"},
-        {"text": " to delete the island."}
+        {
+          "text": "Press "
+        },
+        {
+          "keybind": "key.drop"
+        },
+        {
+          "text": " to delete the island."
+        }
       ]
     }
   ],
@@ -130,7 +160,7 @@
     "color": "gold"
   },
   "island.level.calculation_progress": {
-    "text": "Island level calculation progress: %d / %d (%s)",
+    "text": "Island level calculation progress: %d / %d (%1$s)",
     "color": "red"
   },
   "island.level.calculated": [
@@ -145,6 +175,83 @@
     {
       "text": " (%2$sms)",
       "color": "gray"
+    }
+  ],
+  "board.title": {
+    "text": "",
+    "bold": "true",
+    "color": "blue",
+    "extra": [
+      {
+        "text": "k",
+        "color": "black",
+        "obfuscated": "true"
+      },
+      {"text": "Trian"},
+      {
+        "text": "k",
+        "color": "black",
+        "obfuscated": "true"
+      }
+    ]
+  },
+
+  "board.lines": [
+    {
+      "text": "Welcome, ",
+      "color": "white",
+      "extra": [
+        {"raw": "%1$s"}
+      ]
+    },
+    {
+      "text": "Balance: ",
+      "color": "white",
+      "extra": [
+        {"raw": "%3$s"}
+      ]
+    },
+    {"text": ""},
+    {
+      "text": "Island Level: ",
+      "color": "white",
+      "extra": [
+        {"raw": "%2$s"}
+      ]
+    }
+  ],
+
+  "tokens.info": [
+    {
+      "text": "You have ",
+      "color": "white"
+    },
+    {
+      "text": "%1$s tokens",
+      "color": "blue"
+    }
+  ],
+
+  "tokens.not_enough_tokens": [
+    {
+      "text": "You don't have enough tokens! ",
+      "color": "red"
+    },
+    {
+      "text": "(Need %1$s more)",
+      "color": "gray"
+    }
+  ],
+  "tokens.transferred": [
+    {
+      "raw": "%1$s"
+    },
+    {
+      "text": " transferred to ",
+      "color": "white"
+    },
+    {
+      "raw": "%2$s"
     }
   ]
 }

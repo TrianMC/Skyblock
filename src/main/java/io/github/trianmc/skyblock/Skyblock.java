@@ -7,9 +7,11 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 import dev.jorel.commandapi.CommandAPI;
 import io.github.bluelhf.anemone.Anemones;
+import io.github.trianmc.skyblock.board.SkyBoard;
 import io.github.trianmc.skyblock.command.SkyCommands;
 import io.github.trianmc.skyblock.config.Lang;
 import io.github.trianmc.skyblock.config.SkyConfig;
+import io.github.trianmc.skyblock.economy.SkyEconomy;
 import io.github.trianmc.skyblock.generator.VoidGenerator;
 import io.github.trianmc.skyblock.gui.ControlAnemone;
 import io.github.trianmc.skyblock.islands.IslandManager;
@@ -17,18 +19,25 @@ import io.github.trianmc.skyblock.listener.ProtectionListener;
 import io.github.trianmc.skyblock.modifications.Generators;
 import io.github.trianmc.skyblock.util.IOUtils;
 import io.github.trianmc.skyblock.util.JsonUtils;
+import lombok.SneakyThrows;
+import net.milkbowl.vault.economy.AbstractEconomy;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +52,11 @@ public final class Skyblock extends JavaPlugin {
     private IslandManager islandManager;
     private SkyCommands skyCommands;
     private SkyConfig config;
+
+    private SkyEconomy economy;
+    private boolean shouldWrite = true;
+
+    private SkyBoard board;
 
     @NotNull
     public SkyConfig getSkyConfig() {
@@ -62,15 +76,15 @@ public final class Skyblock extends JavaPlugin {
     @Override
     public void onEnable() {
         this.config = new SkyConfig(this);
-
+        this.board = new SkyBoard(this);
         // Explicitly avoid handling IOException, error is critical
         islandManager = new IslandManager(this, getDataFolder().toPath());
 
-
         initLang();
+        initEconomy();
 
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new Generators(), this);
+        Bukkit.getPluginManager().registerEvents(new Generators(this), this);
 
         Anemones.init(this);
         Anemones.register(new ControlAnemone(this));
@@ -82,11 +96,44 @@ public final class Skyblock extends JavaPlugin {
         skyCommands.register();
     }
 
+    public void reload() {
+        initLang();
+        initEconomy();
+        reloadConfig();
+        config = new SkyConfig(this);
+
+        board.close();
+        board = new SkyBoard(this);
+    }
+
+    @SneakyThrows
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         islandManager.close();
         skyCommands.unregister();
+        if (shouldWrite) {
+            try (OutputStream stream = IOUtils.write(getDataFolder().toPath().resolve("economy.dat"))) {
+                economy.write(stream);
+            }
+
+        }
+    }
+
+    private void initEconomy() {
+        Path econPath = getDataFolder().toPath().resolve("economy.dat");
+        if (!Files.exists(econPath) || !Files.isRegularFile(econPath)) {
+            economy = new SkyEconomy(this);
+        } else try {
+            economy = SkyEconomy.read(this, IOUtils.read(econPath));
+        } catch (Exception e) {
+            getLogger().severe("An error occurred while loading the economy data!");
+            getLogger().severe("To prevent data loss, economy data will not be saved!");
+            shouldWrite = false;
+            economy = new SkyEconomy(this);
+        }
+
+        getServer().getServicesManager().register(Economy.class, economy, this, ServicePriority.Highest);
     }
 
     private void initLang() {
@@ -186,5 +233,9 @@ public final class Skyblock extends JavaPlugin {
 
     public Lang getLang() {
         return lang;
+    }
+
+    public Economy getEconomy() {
+        return economy;
     }
 }
