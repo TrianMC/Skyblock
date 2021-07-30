@@ -35,7 +35,8 @@ public class ShopAnemones {
                             .modifyMeta(meta -> meta.displayName(Component.empty()))
                             .build();
                 case 'x':
-
+                default:
+                    return Items.of(Material.AIR).build();
             }
         }
     }

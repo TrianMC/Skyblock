@@ -9,8 +9,8 @@ public class Mediator {
     static {
         //noinspection SwitchStatementWithTooFewBranches we'll add branches later
         switch (getNMSVersion()) {
-            case "v1_16_R3":
-                nms = new v1_16_R3();
+            case "v1_17_R1":
+                nms = new v1_17_R1();
         }
     }
 

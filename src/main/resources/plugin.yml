@@ -1,7 +1,7 @@
 name: Skyblock
 version: ${project.version}
 main: io.github.trianmc.skyblock.Skyblock
-api-version: 1.16
+api-version: 1.17
 prefix: Trian Skyblock
 depend: [ WorldEdit, Vault ]
 authors: [ bluelhf ]

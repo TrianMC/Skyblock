@@ -168,9 +168,9 @@ public class Island {
                             int sX = snapshot.getX();
                             int sZ = snapshot.getZ();
 
-                            int lmx = sX == minCX ? minXC : 0;
+                            int lmx = sX == minCX ? minXC     : 00;
                             int mmx = sX == maxCX ? maxXC + 1 : 15;
-                            int lmz = sZ == minCZ ? minZC : 0;
+                            int lmz = sZ == minCZ ? minZC     : 00;
                             int mmz = sZ == maxCZ ? maxZC + 1 : 15;
 
 

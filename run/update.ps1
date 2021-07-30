@@ -1,7 +1,7 @@
 Import-Module BitsTransfer
 
 
-$MC = "1.16.5";
+$MC = "1.17.1";
 $Info = (Invoke-WebRequest -UseBasicParsing -Uri "https://papermc.io/api/v2/projects/paper/versions/$MC").Content | ConvertFrom-Json
 $VersionHistory = (Get-Content -Path "version_history.json" -ErrorAction SilentlyContinue) | ConvertFrom-Json -ErrorAction SilentlyContinue
 
